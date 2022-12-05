@@ -1,0 +1,44 @@
+
+- name: Clone Git Repo
+  win_command: git clone https://github.com/mtelvers/base-images-builder.git c:\base-images-builder
+  args:
+    creates: C:\base-images-builder
+
+- name: Switch to Live branch
+  win_command: git checkout live
+  args:
+    chdir: C:\base-images-builder
+    creates: C:\base-images-builder\extract.cmd
+
+- name: Set MINGW version in Dockerfile.build
+  win_shell: (Get-Content Dockerfile.build) | ForEach-Object { $_ -replace 'mingw-ocaml', 'mingw-1809-ocaml' } | Set-Content Dockerfile.build
+  args:
+    chdir: C:\base-images-builder
+  when: ansible_distribution is search("Microsoft Windows Server 2019")
+
+- name: Run extract.cmd
+  win_command: extract.cmd
+  args:
+    chdir: C:\base-images-builder
+    creates: C:\base-images-builder\output\ocluster-worker.exe
+
+- name: Clean up docker
+  win_shell: docker system prune -a -f
+
+- name: Create Secrets folder
+  win_file:
+    path: C:\base-images-builder\secrets
+    state: directory
+
+- name: Copy secrets
+  win_copy:
+    src: pool-windows-x86_64.cap
+    dest: C:\base-images-builder\secrets\pool-windows-x86_64.cap
+  when: ansible_distribution is search("Microsoft Windows Server 2022")
+
+- name: Copy secrets
+  win_copy:
+    src: pool-windows-1809-x86_64.cap
+    dest: C:\base-images-builder\secrets\pool-windows-1809-x86_64.cap
+  when: ansible_distribution is search("Microsoft Windows Server 2019")
+

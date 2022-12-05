@@ -1,0 +1,59 @@
+
+- name: Install Hyper-V
+  win_feature:
+    name: Hyper-V
+    state: present
+    include_sub_features: no
+    include_management_tools: no
+  register: win_feature
+
+- name: Reboot if installing Hyper-V feature requires it
+  win_reboot:
+  when: win_feature.reboot_required
+
+- name: Install NuGet
+  win_psmodule:
+    name: NuGet
+    state: present
+
+- name: Install Docker Provider
+  win_psmodule:
+    name: DockerMsftProvider
+    repository: PSGallery
+    state: present
+
+- name: Install Docker Provider
+  win_shell: Install-Package -Name Docker -ProviderName DockerMsftProvider -Force
+  args:
+    creates: "C:\\Program Files\\Docker\\metadata.json"
+  register: docker
+
+- name: Reboot after Docker installation
+  win_reboot:
+  when: docker.changed
+
+- name: Download WinCred to Windows Temp
+  win_get_url:
+    url: https://github.com/docker/docker-credential-helpers/releases/download/v0.6.4/docker-credential-wincred-v0.6.4-amd64.zip
+    dest: c:\windows\temp\docker-credential-wincred-v0.6.4-amd64.zip
+
+- name: Unzip WinCred
+  win_unzip:
+    src: c:\windows\temp\docker-credential-wincred-v0.6.4-amd64.zip
+    dest: C:\Program Files\Docker
+    creates: C:\Program Files\Docker\docker-credential-wincred.exe
+
+- name: Copy daemon.json
+  win_copy:
+    dest: C:\ProgramData\docker\config\daemon.json
+    content: |
+      {
+          "exec-opts": ["isolation=hyperv"]
+      }
+
+- name: Set service startup mode to auto and ensure it is started
+  win_service:
+    name: docker
+    start_mode: auto
+    state: started
+

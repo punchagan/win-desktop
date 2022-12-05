@@ -1,0 +1,16 @@
+---
+# tasks file for Win ACME to install Remote Desktop Certificates
+
+- name: Download Win ACME
+  win_get_url:
+    url: https://github.com/win-acme/win-acme/releases/download/v2.1.22.1289/win-acme.v2.1.22.1289.x64.trimmed.zip
+    dest: c:\windows\temp\win-acme.v2.1.22.1289.x64.trimmed.zip
+
+- name: Unzip Win ACME
+  win_unzip:
+    src: c:\windows\temp\win-acme.v2.1.22.1289.x64.trimmed.zip
+    dest: c:\Program Files\win-acme
+    creates: c:\Program Files\win-acme\wacs.exe
+    delete_archive: yes
+
+

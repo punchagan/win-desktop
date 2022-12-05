@@ -1,0 +1,97 @@
+---
+# tasks file for various editors
+
+## VIM
+
+- name: Download VIM Executable
+  win_get_url:
+    url: https://ftp.nluug.nl/pub/vim/pc/gvim90.zip
+    dest: c:\windows\temp\gvim90.zip
+
+- name: Unzip VIM Executable
+  win_unzip:
+    src: c:\windows\temp\gvim90.zip
+    dest: c:\Program Files
+    creates: c:\Program Files\vim\vim90\gvim.exe
+    delete_archive: yes
+
+- name: Download VIM Runtime
+  win_get_url:
+    url: https://ftp.nluug.nl/pub/vim/pc/vim90rt.zip
+    dest: c:\windows\temp\vim90rt.zip
+
+- name: Unzip VIM Runtime
+  win_unzip:
+    src: c:\windows\temp\vim90rt.zip
+    dest: c:\Program Files
+    creates: c:\Program Files\vim\vim90\defaults.vim
+    delete_archive: yes
+
+- name: Add VIM to PATH
+  win_path:
+    elements:
+      - 'C:\Program Files\vim\vim90'
+
+- name: Create a shortcut to VIM
+  win_command: create-shortcut.exe --work-dir "C:\Program Files\vim" "C:\Program Files\vim\vim90\gvim.exe" "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GVim.lnk"
+  args:
+    chdir: c:\Program Files\Git\mingw64\bin
+
+## Emacs
+
+- name: Download Emacs
+  win_get_url:
+    url: https://ftp.gnu.org/gnu/emacs/windows/emacs-28/emacs-28.2.zip
+    dest: c:\windows\temp\emacs-28.2.zip
+
+- name: Unzip Emacs Executable
+  win_unzip:
+    src: c:\windows\temp\emacs-28.2.zip
+    dest: c:\Program Files\emacs
+    creates: c:\Program Files\emacs\emacs-28.2\bin\emacs.exe
+    delete_archive: yes
+
+- name: Create a shortcut to Emacs
+  win_command: create-shortcut.exe --work-dir "C:\Program Files\emacs" "C:\Program Files\emacs\emacs-28.2\bin\runemacs.exe" "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Emacs.lnk"
+  args:
+    chdir: c:\Program Files\Git\mingw64\bin
+
+## VS Code
+
+- name: Install Visual Studio Code with WinGet
+  win_command: winget install Microsoft.VisualStudioCode --scope machine
+
+    #Sadly VS Code extensions are installed per user in ~/.vscode
+    #- name: Install OCaml Labs VS Code Extension
+    #  win_command: code.cmd --install-extension ocamllabs.ocaml-platform
+
+- name: Download OCaml Labs VS Code Extension
+  win_get_url:
+    url: https://github.com/ocamllabs/vscode-ocaml-platform/releases/download/1.10.2/ocaml-platform.vsix
+    dest: c:\windows\temp\ocaml-platform.zip
+
+- name: Unzip OCaml Labs VS Code Extension
+  win_unzip:
+    src: c:\windows\temp\ocaml-platform.zip
+    dest: c:\Program Files\Microsoft VS Code\resources\app\extensions\ocamllabs.ocaml-platform-1.10.2
+    creates: c:\Program Files\Microsoft VS Code\resources\app\extensions\ocamllabs.ocaml-platform-1.10.2
+    delete_archive: yes
+
+- name: Rename VSI Manifest
+  win_shell: 'move-item "c:\Program Files\Microsoft VS Code\resources\app\extensions\ocamllabs.ocaml-platform-1.10.2\extension.vsixmanifest" "c:\Program Files\Microsoft VS Code\resources\app\extensions\ocamllabs.ocaml-platform-1.10.2\.vsixmanifest"'
+
+- name: Relocate folder contents
+  win_shell: 'move-item "c:\Program Files\Microsoft VS Code\resources\app\extensions\ocamllabs.ocaml-platform-1.10.2\extension\*" "c:\Program Files\Microsoft VS Code\resources\app\extensions\ocamllabs.ocaml-platform-1.10.2"'
+
+- name: Install ocaml-lsp-server in the default switch
+  win_command: c:\cygwin64\bin\bash --login -c "opam install ocaml-lsp-server --yes"
+
+- name: Add ocaml-env to path by adding /usr/local/bin
+  win_path:
+    elements:
+      - C:\cygwin64\usr\local\bin
+
+- name: Set db_home
+  win_command: >-
+    c:\cygwin64\bin\bash --login -c "sed -i -e '$adb_home: /%H' /etc/nsswitch.conf"
+

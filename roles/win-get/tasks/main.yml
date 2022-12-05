@@ -1,0 +1,67 @@
+---
+# tasks file for WinGet and everything it installs
+
+- name: Install VC++
+  win_package:
+    path: https://aka.ms/vs/17/release/vc_redist.x64.exe
+    product_id: '{A181A302-3F6D-4BAD-97A8-A426A6499D78}'
+    arguments:
+      - /passive
+      - /norestart
+
+- name: Download WinGet
+  win_get_url:
+    url: https://github.com/microsoft/winget-cli/releases/download/v1.2.10271/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+    dest: c:\windows\temp\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.zip
+
+- name: Unzip WinGet
+  win_unzip:
+    src: c:\windows\temp\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.zip
+    dest: c:\windows\temp
+    creates: c:\windows\temp\AppInstaller_x64.msix
+    delete_archive: yes
+
+- name: Rename intermediate MSI to ZIP
+  win_shell: move c:\windows\temp\AppInstaller_x64.msix c:\windows\temp\AppInstaller_x64.zip
+  args:
+    creates: c:\windows\temp\AppInstaller_x64.zip
+
+- name: Unzip WinGet x64
+  win_unzip:
+    src: c:\windows\temp\AppInstaller_x64.zip
+    dest: c:\Program Files\WinGet
+    creates: c:\Program Files\WinGet
+    delete_archive: yes
+
+- name: Add WinGet to PATH
+  win_path:
+    elements:
+      - 'C:\Program Files\WinGet'
+
+- name: Install Git with WinGet
+  win_command: winget install --accept-source-agreements --accept-package-agreements git.git
+
+- name: Configure Git CRLF
+  win_command: git config --global core.autocrlf false
+
+- name: Configure Git EOL
+  win_command: git config --global core.eol lf
+
+- name: Install .Net with WinGet
+  win_command: winget install Microsoft.dotnet.runtime.6 --accept-source-agreements
+
+    #- name: Install PowerShell with WinGet
+    #  win_command: winget install Microsoft.PowerShell
+
+- name: Install PowerToys with WinGet
+  win_command: winget install Microsoft.PowerToys
+
+    #- name: Install Windows Terminal with WinGet
+    #  win_command: winget install Microsoft.WindowsTerminal
+
+- name: Install 7-Zip with WinGet
+  win_command: winget install 7zip.7zip
+
+- name: Install VS Build Tools with WinGet
+  win_command: winget install Microsoft.VisualStudio.2022.Community --silent --override "--wait --quiet --add ProductLang En-us --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended"
+

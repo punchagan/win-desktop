@@ -1,0 +1,84 @@
+---
+# tasks file for Windows System for Linux
+
+- name: Install Microsoft Subsystem for Linux
+  win_optional_feature:
+    name: Microsoft-Windows-Subsystem-Linux
+    state: present
+  register: wsl_status
+
+- name: Reboot if installing Linux Subsytem as feature requires it
+  win_reboot:
+  when: wsl_status.reboot_required
+
+- name: Install Nuget
+  win_shell: Install-PackageProvider -Name Nuget -Force
+
+- name: Install PSCX
+  win_psmodule:
+    name: Pscx
+    state: present
+    allow_clobber: true
+
+    #- name: Install Kernel extension for WSL
+    #  win_package:
+    #    path: https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi
+
+      #- name: Download Ubuntu for WSL
+      #  win_get_url:
+      #    url: https://aka.ms/wslubuntu2204
+      #    dest: c:\windows\temp\wslubuntu2204.zip
+
+- name: Copy a WSL rather than download it
+  win_copy:
+    src: /root/Ubuntu2204-220620.AppxBundle
+    dest: C:\windows\temp\Ubuntu2204-220620.AppxBundle
+
+- name: Unzip ubuntu2204.zip
+  win_unzip:
+    src: c:\windows\temp\Ubuntu2204-220620.AppxBundle
+    dest: c:\windows\temp
+    delete_archive: yes
+
+- name: Unzip ubuntu2204.zip
+  win_unzip:
+    src: c:\windows\temp\Ubuntu_2204.0.10.0_x64.appx
+    dest: c:\windows\temp\ubuntu
+    delete_archive: yes
+
+- name: Install Ubuntu 22.04
+  win_package:
+    path: c:\windows\temp\ubuntu\ubuntu2204.exe
+    arguments:
+      - install
+      - --root
+
+- name: Update WSL image
+  win_shell: wsl -d Ubuntu-22.04 -e apt-get update
+
+- name: Upgrade Ubuntu
+  win_shell: wsl -d Ubuntu-22.04 -e apt-get full-upgrade -y
+
+- name: Removed unused packages
+  win_shell: wsl -d Ubuntu-22.04 -e apt-get autoremove -y
+
+- name: Clean APT
+  win_shell: wsl -d Ubuntu-22.04 -e apt-get autoclean
+
+- name: Reboot WSL
+  win_shell: wsl -d Ubuntu-22.04 -e reboot
+  register: result
+  failed_when: result.rc != 1
+
+- name: Export Ubuntu
+  win_shell: wsl --export Ubuntu-22.04 "c:\windows\temp\Ubuntu-fs.tar"
+
+- name: Delete the distro
+  win_shell: wsl --unregister Ubuntu-22.04
+
+- name: Reimport the image
+  win_shell: wsl --import Ubuntu-22.04 C:\Users\Administrator\AppData\Local\ubuntu "c:\windows\temp\Ubuntu-fs.tar"
+
+- name: Reboot
+  win_reboot:
+

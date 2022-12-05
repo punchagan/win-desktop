@@ -1,0 +1,10 @@
+- hosts: all
+  roles:
+    - windows
+    - win-acme
+    - win-get
+    - cygwin
+    - ocaml
+    - opam
+    - editors
+        #    - wsl

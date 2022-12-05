@@ -1,0 +1,24 @@
+---
+# tasks file for Opam
+
+- name: Set OPAMROOT to c:\opam
+  win_environment:
+    state: present
+    name: OPAMROOT
+    value: c:\opam
+    level: machine
+
+- name: Download FDOpen Installer
+  win_get_url:
+    url: https://github.com/fdopen/opam-repository-mingw/releases/download/0.0.0.2/opam64.tar.xz
+    dest: c:\windows\temp\opam64.tar.xz
+
+- name: Untar FDOpen
+  win_command: c:\cygwin64\bin\bash --login -c "cd /cygdrive/c/Windows/Temp && tar -xf opam64.tar.xz"
+
+- name: Install Opam64
+  win_command: c:\cygwin64\bin\bash --login -c "cd /cygdrive/c/Windows/Temp && bash opam64/install.sh"
+
+- name: Run Opam Init
+  win_command: c:\cygwin64\bin\bash --login -c "opam init default 'https://github.com/fdopen/opam-repository-mingw.git#opam2' -c 'ocaml-variants.4.13.1+mingw64c' --disable-sandboxing --yes"
+

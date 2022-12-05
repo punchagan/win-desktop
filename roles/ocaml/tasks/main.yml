@@ -1,0 +1,25 @@
+---
+# tasks file for OCaml
+
+- name: Clone Git Repo
+  win_command: git clone --depth 1 https://github.com/ocaml/ocaml.git -b 4.14 c:\ocaml
+
+- name: Git Submodule update
+  win_command: git submodule update --init
+  args:
+    chdir: c:\ocaml
+
+- name: Configure OCaml build
+  win_command: c:\cygwin64\bin\bash --login -c "cd /cygdrive/c/ocaml && ./configure --build=x86_64-pc-cygwin --host=x86_64-w64-mingw32"
+
+- name: Build OCaml
+  win_command: c:\cygwin64\bin\bash --login -c "cd /cygdrive/c/ocaml && make"
+
+- name: Install OCaml
+  win_command: c:\cygwin64\bin\bash --login -c "cd /cygdrive/c/ocaml && make install"
+
+- name: Add OCaml to PATH
+  win_path:
+    elements:
+      - C:\ocamlmgw64\bin
+

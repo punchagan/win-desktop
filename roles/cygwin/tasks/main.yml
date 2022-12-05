@@ -1,0 +1,27 @@
+---
+# tasks file for Cygwin
+
+- name: Ensure c:\cygwin64
+  win_file:
+    path: c:\cygwin64
+    state: directory
+
+- name: Download Cygwin
+  win_get_url:
+    url: https://www.cygwin.com/setup-x86_64.exe
+    dest: c:\cygwin64\setup-x86_64.exe
+
+- name: Install Cygwin
+  win_package:
+    path: c:\cygwin64\setup-x86_64.exe
+    arguments: -q -O -s https://cygwin.mirror.uk.sargasso.net -P make,diffutils,mingw64-x86_64-gcc-core,rsync,patch,curl,unzip,git,m4,perl,wget,mercurial
+
+- name: Add Cygwin to PATH
+  win_path:
+    elements:
+      - 'C:\cygwin\usr\bin'
+
+- name: Set noacl in /etc/fstab
+  win_command: >-
+    c:\cygwin64\bin\bash --login -c "awk -i inplace -vN='noacl,' '/(^#)|(^$)/{print; next}{$4=N$4; print}' /etc/fstab"
+

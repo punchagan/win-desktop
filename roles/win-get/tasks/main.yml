@@ -4,7 +4,7 @@
 - name: Install VC++
   win_package:
     path: https://aka.ms/vs/17/release/vc_redist.x64.exe
-    product_id: '{A181A302-3F6D-4BAD-97A8-A426A6499D78}'
+    product_id: "{A181A302-3F6D-4BAD-97A8-A426A6499D78}"
     arguments:
       - /passive
       - /norestart
@@ -48,13 +48,15 @@
   win_command: git config --global core.eol lf
 
 - name: Install .Net with WinGet
-  win_command: winget install Microsoft.dotnet.runtime.6 --accept-source-agreements
+  win_command:
+    winget install Microsoft.dotnet.runtime.6 --accept-source-agreements
 
     #- name: Install PowerShell with WinGet
     #  win_command: winget install Microsoft.PowerShell
 
 - name: Install PowerToys with WinGet
-  win_command: winget install Microsoft.PowerToys
+  win_command:
+    winget install Microsoft.PowerToys
 
     #- name: Install Windows Terminal with WinGet
     #  win_command: winget install Microsoft.WindowsTerminal
@@ -64,4 +66,3 @@
 
 - name: Install VS Build Tools with WinGet
   win_command: winget install Microsoft.VisualStudio.2022.Community --silent --override "--wait --quiet --add ProductLang En-us --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended"
-

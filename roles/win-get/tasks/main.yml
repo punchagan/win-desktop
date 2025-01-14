@@ -67,6 +67,9 @@
     #- name: Install Windows Terminal with WinGet
     #  win_command: winget install Microsoft.WindowsTerminal
 
+- name: Install Clink for GNU Readline shortcuts on Windows CMD
+  win_command: winget install chrisant996.Clink
+
 - name: Install 7-Zip with WinGet
   win_command: winget install 7zip.7zip
 

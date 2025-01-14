@@ -47,6 +47,9 @@
 - name: Configure Git EOL
   win_command: git config --global core.eol lf
 
+- name: Install Git-LFS with WinGet
+  win_command: winget install --accept-source-agreements --accept-package-agreements GitHub.GitLFS
+
 - name: Install .Net with WinGet
   win_command:
     winget install Microsoft.dotnet.runtime.6 --accept-source-agreements

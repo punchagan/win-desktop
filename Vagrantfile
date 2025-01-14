@@ -1,5 +1,5 @@
 Vagrant.configure("2") do |config|
-  config.vm.box = "gusztavvargadr/windows-10"
+  config.vm.box = "gusztavvargadr/windows-11"
   config.vm.provision :ansible do |ansible|
     ansible.limit = "all"
     ansible.playbook = "playbook.yml"

@@ -44,6 +44,9 @@
 - name: Configure Git CRLF
   win_command: git config --global core.autocrlf false
 
+- name: Enable Symlinks
+  win_command: git config --global core.symlinks true
+
 - name: Configure Git EOL
   win_command: git config --global core.eol lf
 

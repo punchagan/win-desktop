@@ -4,7 +4,7 @@
     - win-acme
     - win-get
     - cygwin
-    - ocaml
+    # - ocaml
     - opam
     - editors
-        #    - wsl
+    #    - wsl

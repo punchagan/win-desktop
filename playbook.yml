@@ -3,7 +3,7 @@
     - windows
     - win-acme
     - win-get
-    - cygwin
+    # - cygwin
     # - ocaml
     - opam
     - editors

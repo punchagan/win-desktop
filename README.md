@@ -1,7 +1,7 @@
 
 # Win-Desktop
 
-This repo installs some basis tools on a Windows 10 Vagrant machine
+This repo installs some basis tools on a Windows 11 Vagrant machine
 intended to help developers of OCaml get started on Windows.
 
 ```shell=
